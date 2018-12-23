@@ -108,12 +108,14 @@ viewJSON model =
                     [ ul [] (List.map printItem url) ]
                 ]
 
-
+-- replace : String -> String -> String -> String
 printItem : Evento -> Html Msg
 printItem evento =
     li []
         [ h3 [] [ text evento.name ]
-        , p [] [ text evento.description ]
+        , p [] [ text (evento.description = replace All (regex "[abc]") (\_ -> "") )]
+        -- , p [] [ text (String.split "<p>" evento.description |> String.join "")  ]
+        -- , p [] [ text evento.description ]
         -- , p [] [ text ("ID: " ++ String.fromInt evento.id) ]
         ]
 
