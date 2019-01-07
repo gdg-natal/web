@@ -7,7 +7,7 @@ import Html.Events exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Decode
-import Models exposing (Event, Info, Model, Person, Photo)
+import Models exposing (Event, Info, Model, Person, Photo, Page(..))
 import Msgs exposing (Msg(..))
 import Pages.Events as Events
 import Pages.Members as Members
@@ -17,6 +17,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { members = []
       , events = []
+      , page = Members
       }
     , Cmd.none
     )
@@ -61,6 +62,9 @@ update msg model =
             , Cmd.none
             )
 
+        ChangePage pageToChange ->
+            ({ model | page = pageToChange } , Cmd.none)
+
 
 -- MAIN
 
@@ -76,7 +80,16 @@ main =
 
 view : Model -> Html Msg
 view model =
+    let
+        currentPage =
+            case model.page of
+                Events ->
+                    Events.view model
+                Members ->
+                    Members.view model
+    in
     div []
-        [ Events.view model
-        , Members.view model
+        [ button [ onClick (ChangePage Events) ] [ text "Events" ]
+        , button [ onClick (ChangePage Members) ] [ text "Members" ]
+        , currentPage
         ]

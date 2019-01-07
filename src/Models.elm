@@ -1,4 +1,4 @@
-module Models exposing (Event, Info, Model, Person, Photo, InfoPerson)
+module Models exposing (Event, Info, Model, Person, Photo, InfoPerson, Page(..))
 
 -- import Pages.Events as Events
 
