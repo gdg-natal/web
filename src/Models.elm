@@ -1,15 +1,23 @@
-module Models exposing (Event, Info, Model, Person, Photo, InfoPerson, Page(..))
+module Models exposing (Event, Info, InfoPerson, Model, Page(..), Person, Photo)
 
--- import Pages.Events as Events
+import Browser.Navigation as Nav
+import Url
 
-type Page = Members
+
+type Page
+    = Members
     | Events
+
 
 type alias Model =
     { members : List Person
     , events : List Event
     , page : Page
+    , key : Nav.Key
+    , url : Url.Url
     }
+
+
 
 -- Models Members
 
@@ -24,10 +32,13 @@ type alias Person =
     , name : String
     }
 
+
 type alias InfoPerson =
     { id : Int
     , name : String
     }
+
+
 
 -- Models Events
 

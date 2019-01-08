@@ -5,6 +5,8 @@ import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Parser exposing (..)
+import Html.Parser.Util exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Decode
@@ -39,9 +41,18 @@ viewJSON model =
 
 printItem : Event -> Html Msg
 printItem evento =
+    let
+        nodes =
+            case Html.Parser.run evento.description of
+                Ok parsedNodes ->
+                    Html.Parser.Util.toVirtualDom parsedNodes
+
+                _ ->
+                    []
+    in
     li []
         [ h3 [] [ text evento.name ]
-        , p [] [ text (String.split "<p>" evento.description |> String.join "") ]
+        , div [] nodes
 
         -- , p [] [ text evento.description ]
         -- , p [] [ text ("ID: " ++ String.fromInt evento.id) ]
