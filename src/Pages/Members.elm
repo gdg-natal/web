@@ -1,4 +1,4 @@
-module Pages.Members exposing (view, getMyJSON)
+module Pages.Members exposing (getMyJSON, view)
 
 import Browser
 import Dict
@@ -12,6 +12,7 @@ import Models exposing (InfoPerson, Model, Person, Photo)
 import Msgs exposing (Msg(..))
 
 
+
 -- VIEW
 
 
@@ -19,7 +20,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text "Lista de Membros do GDG - Natal" ]
-        , button [ onClick LoadMembers ] [ text "vem ni mim" ]
+        , button [ onClick LoadMembers ] [ text "Expandir" ]
         , viewJSON model
         ]
 
@@ -36,6 +37,7 @@ printItem : Person -> Html Msg
 printItem person =
     li []
         [ h3 [] [ text person.name ]
+        , img [ src person.photo.photo_link, height 100 ] []
         , p [] [ text ("ID: " ++ String.fromInt person.id) ]
         ]
 
@@ -54,25 +56,28 @@ getMyJSON =
 
 decoder : Decode.Decoder (List Person)
 decoder =
-    Decode.map papacudocurioso (Decode.dict infoDecoder)
+    Decode.map poMagico (Decode.dict infoDecoder)
 
 
-papacudocurioso : Dict.Dict String InfoPerson -> List Person
-papacudocurioso =
-    List.map Tuple.second << Dict.toList << Dict.map infoToChamp
+poMagico : Dict.Dict String InfoPerson -> List Person
+poMagico =
+    List.map Tuple.second << Dict.toList << Dict.map infoToPerson
+
+
+infoToPerson : String -> InfoPerson -> Person
+infoToPerson chave { id, name, photo } =
+    Person chave id name photo
+
+
+photoDecoder : Decode.Decoder Photo
+photoDecoder =
+    Decode.succeed Photo
+        |> Decode.required "photo_link" Decode.string
 
 
 infoDecoder : Decode.Decoder InfoPerson
 infoDecoder =
     Decode.succeed InfoPerson
         |> Decode.required "id" Decode.int
-        |> Decode.optional "name" Decode.string ""
-
-
-
--- (Decode.field "name" Decode.string)
-
-
-infoToChamp : String -> InfoPerson -> Person
-infoToChamp chave { id, name } =
-    Person chave id name
+        |> Decode.optional "name" Decode.string "Desconhecido"
+        |> Decode.optional "photo" photoDecoder { photo_link = "https://workshopexposicaonainternet.nic.br/seminario-privacidade/img/default-user.png" }

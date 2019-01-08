@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Decode
-import Models exposing (Event, Info, Model, Page(..), Person, Photo)
+import Models exposing (Event, Info, Model, Page(..), Person)
 import Msgs exposing (Msg(..))
 import Pages.Events as Events
 import Pages.Members as Members
@@ -17,13 +17,6 @@ import Url
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
-    let
-        debugUrl =
-            Debug.log "url" url
-
-        debugKey =
-            Debug.log "key" key
-    in
     ( { members = []
       , events = []
       , page = Members
@@ -57,7 +50,7 @@ update msg model =
                 Ok data ->
                     let
                         succ =
-                            Debug.log "data" data
+                            Debug.log "dataEvents" data
                     in
                     ( { model | events = data }, Cmd.none )
 
@@ -68,10 +61,21 @@ update msg model =
                     in
                     ( model, Cmd.none )
 
-        GotMembersJSON _ ->
-            ( model
-            , Cmd.none
-            )
+        GotMembersJSON result ->
+            case result of
+                Ok data ->
+                    let
+                        succ =
+                            Debug.log "dataMembers" data
+                    in
+                    ( { model | members = data }, Cmd.none )
+
+                Err erro ->
+                    let
+                        err =
+                            Debug.log "dataErro" erro
+                    in
+                    ( model, Cmd.none )
 
         ChangePage pageToChange ->
             ( { model | page = pageToChange }, Cmd.none )
@@ -82,10 +86,6 @@ update msg model =
             )
 
         LinkClicked urlRequest ->
-            let
-                debugUrl =
-                    Debug.log "urlRequest" urlRequest
-            in
             case urlRequest of
                 Browser.Internal url ->
                     ( { model | url = url }, Nav.pushUrl model.key (Url.toString url) )
@@ -112,9 +112,6 @@ main =
 view : Model -> Browser.Document Msg
 view model =
     let
-        debugPage =
-            Debug.log "path" model.url.path
-
         page =
             case model.url.path of
                 "/events" ->
@@ -128,14 +125,12 @@ view model =
         [ div []
             [ viewLink "/members"
             , viewLink "/events"
-            , button [ onClick (ChangePage Events) ] [ text "Events" ]
-            , button [ onClick (ChangePage Members) ] [ text "Members" ]
             , page
             ]
         ]
     }
 
 
-viewLink : String -> Html msg
+viewLink : String -> Html Msg
 viewLink path =
     li [] [ a [ href path ] [ text path ] ]

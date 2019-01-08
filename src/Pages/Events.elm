@@ -22,7 +22,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text "Lista de Eventos do GDG - Natal" ]
-        , button [ onClick LoadEvents ] [ text "seu cu" ]
+        , button [ onClick LoadEvents ] [ text "Expandir" ]
         , viewJSON model
         ]
 
@@ -33,10 +33,6 @@ viewJSON model =
         [ div []
             [ ul [] (List.map printItem model.events) ]
         ]
-
-
-
--- replace : String -> String -> String -> String
 
 
 printItem : Event -> Html Msg
@@ -53,9 +49,6 @@ printItem evento =
     li []
         [ h3 [] [ text evento.name ]
         , div [] nodes
-
-        -- , p [] [ text evento.description ]
-        -- , p [] [ text ("ID: " ++ String.fromInt evento.id) ]
         ]
 
 

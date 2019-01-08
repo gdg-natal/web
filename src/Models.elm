@@ -23,19 +23,21 @@ type alias Model =
 
 
 type alias Photo =
-    { base_url : String }
+    { photo_link : String }
 
 
 type alias Person =
     { chave : String
     , id : Int
     , name : String
+    , photo : Photo
     }
 
 
 type alias InfoPerson =
     { id : Int
     , name : String
+    , photo : Photo
     }
 
 
