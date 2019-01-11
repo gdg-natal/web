@@ -14,3 +14,4 @@ type Msg
     | ChangePage Page
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | KeyPress String

@@ -20,7 +20,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text "Lista de Membros do GDG - Natal" ]
-        , button [ onClick LoadMembers ] [ text "Expandir" ]
+        , input [ placeholder "Buscar" ] []
+        , br [] []
         , viewJSON model
         ]
 

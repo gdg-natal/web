@@ -17,13 +17,24 @@ import Url
 
 init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
+    let
+        msg =
+            case url.path of
+                "/events" ->
+                    Events.getMyJSON
+
+                _ ->
+                    Members.getMyJSON
+    in
     ( { members = []
       , events = []
+      , eventsFiltered = []
       , page = Members
       , url = url
       , key = key
+      , find = ""
       }
-    , Cmd.none
+    , msg
     )
 
 
@@ -48,11 +59,7 @@ update msg model =
         GotEventsJSON result ->
             case result of
                 Ok data ->
-                    let
-                        succ =
-                            Debug.log "dataEvents" data
-                    in
-                    ( { model | events = data }, Cmd.none )
+                    ( { model | events = data, eventsFiltered = data }, Cmd.none )
 
                 Err erro ->
                     let
@@ -64,10 +71,6 @@ update msg model =
         GotMembersJSON result ->
             case result of
                 Ok data ->
-                    let
-                        succ =
-                            Debug.log "dataMembers" data
-                    in
                     ( { model | members = data }, Cmd.none )
 
                 Err erro ->
@@ -78,11 +81,29 @@ update msg model =
                     ( model, Cmd.none )
 
         ChangePage pageToChange ->
-            ( { model | page = pageToChange }, Cmd.none )
+            let
+                cmd =
+                    case model.url.path of
+                        "/events" ->
+                            Events.getMyJSON
+
+                        _ ->
+                            Members.getMyJSON
+            in
+            ( { model | page = pageToChange }, cmd )
 
         UrlChanged url ->
+            let
+                cmd =
+                    case url.path of
+                        "/events" ->
+                            Events.getMyJSON
+
+                        _ ->
+                            Members.getMyJSON
+            in
             ( model
-            , Cmd.none
+            , cmd
             )
 
         LinkClicked urlRequest ->
@@ -92,6 +113,18 @@ update msg model =
 
                 Browser.External href ->
                     ( model, Nav.load href )
+
+        KeyPress newContent ->
+            let
+                eventsFiltered = 
+                    case newContent of
+                        "" ->  
+                            model.events
+                    
+                        _ ->
+                            Events.filterEvents newContent model
+            in
+            ( { model |find = newContent, eventsFiltered = eventsFiltered }, Cmd.none )
 
 
 

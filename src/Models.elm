@@ -12,9 +12,11 @@ type Page
 type alias Model =
     { members : List Person
     , events : List Event
+    , eventsFiltered : List Event
     , page : Page
     , key : Nav.Key
     , url : Url.Url
+    , find : String
     }
 
 

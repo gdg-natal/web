@@ -1,7 +1,8 @@
-module Pages.Events exposing (getMyJSON, view)
+module Pages.Events exposing (getMyJSON, view, filterEvents)
 
 import Browser
 import Dict
+import ElmTextSearch
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -22,7 +23,8 @@ view : Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text "Lista de Eventos do GDG - Natal" ]
-        , button [ onClick LoadEvents ] [ text "Expandir" ]
+        , input [ placeholder "Buscar", value model.find, onInput KeyPress ] []
+        , br [] []
         , viewJSON model
         ]
 
@@ -31,7 +33,7 @@ viewJSON : Model -> Html Msg
 viewJSON model =
     div []
         [ div []
-            [ ul [] (List.map printItem model.events) ]
+            [ ul [] (List.map printItem model.eventsFiltered) ]
         ]
 
 
@@ -51,6 +53,19 @@ printItem evento =
         , div [] nodes
         ]
 
+
+filterEvents : String -> Model -> List Event
+filterEvents str model =
+    List.filter (checkName str) model.events
+
+
+checkName : String -> Event -> Bool
+checkName str event =
+    let
+        e =
+            String.indexes str event.name
+    in
+    List.length e > 0
 
 
 -- HTTP
