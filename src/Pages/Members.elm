@@ -60,10 +60,17 @@ decoder =
     Decode.map poMagico (Decode.dict infoDecoder)
 
 
-poMagico : Dict.Dict String InfoPerson -> List Person
-poMagico =
-    List.map Tuple.second << Dict.toList << Dict.map infoToPerson
+-- Outra forma de ser implementado
+-- poMagico : Dict.Dict String InfoPerson -> List Person
+-- poMagico =
+--     List.map Tuple.second << Dict.toList << Dict.map infoToPerson
 
+poMagico : Dict.Dict String Info -> List Event
+poMagico dict = 
+    dict
+    |> Dict.map infoToEvento
+    |> Dict.toList
+    |> List.map Tuple.second
 
 infoToPerson : String -> InfoPerson -> Person
 infoToPerson chave { id, name, photo } =

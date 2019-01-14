@@ -5183,11 +5183,6 @@ var author$project$Pages$Events$infoToEvento = F2(
 		var name = _n0.name;
 		return A3(author$project$Models$Event, chave, description, name);
 	});
-var elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -5285,13 +5280,13 @@ var elm$core$Tuple$second = function (_n0) {
 	var y = _n0.b;
 	return y;
 };
-var author$project$Pages$Events$papacudocurioso = A2(
-	elm$core$Basics$composeL,
-	A2(
-		elm$core$Basics$composeL,
-		elm$core$List$map(elm$core$Tuple$second),
-		elm$core$Dict$toList),
-	elm$core$Dict$map(author$project$Pages$Events$infoToEvento));
+var author$project$Pages$Events$papacudocurioso = function (dict) {
+	return A2(
+		elm$core$List$map,
+		elm$core$Tuple$second,
+		elm$core$Dict$toList(
+			A2(elm$core$Dict$map, author$project$Pages$Events$infoToEvento, dict)));
+};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Dict$Black = {$: 'Black'};
 var elm$core$Basics$compare = _Utils_compare;
@@ -6190,6 +6185,11 @@ var author$project$Pages$Members$infoToPerson = F2(
 		var name = _n0.name;
 		var photo = _n0.photo;
 		return A4(author$project$Models$Person, chave, id, name, photo);
+	});
+var elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
 	});
 var author$project$Pages$Members$poMagico = A2(
 	elm$core$Basics$composeL,

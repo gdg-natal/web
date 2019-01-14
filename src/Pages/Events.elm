@@ -84,9 +84,17 @@ decoder =
     Decode.map papacudocurioso (Decode.dict infoDecoder)
 
 
+-- Outra forma de ser implementado
+-- papacudocurioso : Dict.Dict String Info -> List Event
+-- papacudocurioso =
+--     List.map Tuple.second << Dict.toList << Dict.map infoToEvento
+
 papacudocurioso : Dict.Dict String Info -> List Event
-papacudocurioso =
-    List.map Tuple.second << Dict.toList << Dict.map infoToEvento
+papacudocurioso dict = 
+    dict
+    |> Dict.map infoToEvento
+    |> Dict.toList
+    |> List.map Tuple.second
 
 
 infoDecoder : Decode.Decoder Info
