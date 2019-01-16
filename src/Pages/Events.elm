@@ -11,7 +11,7 @@ import Html.Parser.Util exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Decode
-import Models exposing (Event, Info, Model)
+import Models exposing (..)
 import Msgs exposing (Msg(..))
 
 
@@ -33,15 +33,15 @@ viewJSON : Model -> Html Msg
 viewJSON model =
     div []
         [ div []
-            [ ul [] (List.map printItem model.eventsFiltered) ]
+            [ ul [] (List.map printItem model.eventsFiltered ) ]
         ]
 
 
-printItem : Event -> Html Msg
+printItem : (Searchable Event) -> Html Msg
 printItem evento =
     let
         nodes =
-            case Html.Parser.run evento.description of
+            case Html.Parser.run evento.obj.description of
                 Ok parsedNodes ->
                     Html.Parser.Util.toVirtualDom parsedNodes
 
@@ -49,23 +49,23 @@ printItem evento =
                     []
     in
     li []
-        [ h3 [] [ text evento.name ]
+        [ h3 [] [ text evento.obj.name ]
         , div [] nodes
         ]
 
 
-filterEvents : String -> Model -> List Event
-filterEvents str model =
-    List.filter (checkName str) model.events
+filterEvents : String -> List (Searchable a) -> List (Searchable a)
+filterEvents str list =
+    List.filter (checkName str) list
 
 
-checkName : String -> Event -> Bool
-checkName str event =
+checkName : String -> Searchable a -> Bool
+checkName str searchable =
     let
-        e =
-            String.indexes str event.name
+        indexes =
+            String.indexes (String.toLower str) (String.toLower searchable.searchKey)
     in
-    List.length e > 0
+    List.length indexes > 0
 
 
 -- HTTP
@@ -79,31 +79,26 @@ getMyJSON =
         }
 
 
-decoder : Decode.Decoder (List Event)
+decoder : Decode.Decoder (List (Searchable Event))
 decoder =
-    Decode.map papacudocurioso (Decode.dict infoDecoder)
+    Decode.map dictToList (Decode.dict jsonEventDecoder)
 
 
--- Outra forma de ser implementado
--- papacudocurioso : Dict.Dict String Info -> List Event
--- papacudocurioso =
---     List.map Tuple.second << Dict.toList << Dict.map infoToEvento
-
-papacudocurioso : Dict.Dict String Info -> List Event
-papacudocurioso dict = 
+dictToList : Dict.Dict String JsonEvent -> List (Searchable Event)
+dictToList dict = 
     dict
-    |> Dict.map infoToEvento
+    |> Dict.map jsonEventToSearchableEvent
     |> Dict.toList
     |> List.map Tuple.second
 
 
-infoDecoder : Decode.Decoder Info
-infoDecoder =
-    Decode.succeed Info
+jsonEventDecoder : Decode.Decoder JsonEvent
+jsonEventDecoder =
+    Decode.succeed JsonEvent
         |> Decode.optional "description" Decode.string ""
         |> Decode.optional "name" Decode.string ""
 
 
-infoToEvento : String -> Info -> Event
-infoToEvento chave { description, name } =
-    Event chave description name
+jsonEventToSearchableEvent : String -> JsonEvent -> Searchable Event
+jsonEventToSearchableEvent chave { description, name } =
+    (Searchable name (Event chave description name))

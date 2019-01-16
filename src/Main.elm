@@ -8,7 +8,7 @@ import Html.Events exposing (..)
 import Http
 import Json.Decode as Decode
 import Json.Decode.Pipeline as Decode
-import Models exposing (Event, Info, Model, Page(..), Person)
+import Models exposing (..)
 import Msgs exposing (Msg(..))
 import Pages.Events as Events
 import Pages.Members as Members
@@ -29,6 +29,7 @@ init _ url key =
     ( { members = []
       , events = []
       , eventsFiltered = []
+      , membersFiltered = []
       , page = Members
       , url = url
       , key = key
@@ -71,8 +72,8 @@ update msg model =
         GotMembersJSON result ->
             case result of
                 Ok data ->
-                    ( { model | members = data }, Cmd.none )
-
+                    ( { model | members = data, membersFiltered = data }, Cmd.none )
+                    
                 Err erro ->
                     let
                         err =
@@ -116,16 +117,23 @@ update msg model =
 
         KeyPress newContent ->
             let
+                membersFiltered = 
+                    case newContent of
+                        "" ->  
+                            model.members
+                    
+                        _ ->
+                            Members.filterMembers newContent model.members
+
                 eventsFiltered = 
                     case newContent of
                         "" ->  
                             model.events
                     
                         _ ->
-                            Events.filterEvents newContent model
+                            Events.filterEvents newContent model.events
             in
-            ( { model |find = newContent, eventsFiltered = eventsFiltered }, Cmd.none )
-
+            ( { model |find = newContent, membersFiltered = membersFiltered, eventsFiltered = eventsFiltered }, Cmd.none )
 
 
 -- MAIN

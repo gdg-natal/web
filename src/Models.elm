@@ -1,4 +1,4 @@
-module Models exposing (Event, Info, InfoPerson, Model, Page(..), Person, Photo)
+module Models exposing (Event, JsonEvent, InfoPerson, Model, Page(..), Person, Photo, Searchable)
 
 import Browser.Navigation as Nav
 import Url
@@ -10,16 +10,15 @@ type Page
 
 
 type alias Model =
-    { members : List Person
-    , events : List Event
-    , eventsFiltered : List Event
+    { members : List (Searchable Person)
+    , events : List (Searchable Event)
+    , eventsFiltered : List (Searchable Event)
+    , membersFiltered : List (Searchable Person)
     , page : Page
     , key : Nav.Key
     , url : Url.Url
     , find : String
     }
-
-
 
 -- Models Members
 
@@ -27,6 +26,10 @@ type alias Model =
 type alias Photo =
     { photo_link : String }
 
+type alias Searchable a = 
+    { searchKey : String
+    , obj : a
+    }
 
 type alias Person =
     { chave : String
@@ -54,7 +57,7 @@ type alias Event =
     }
 
 
-type alias Info =
+type alias JsonEvent =
     { description : String
     , name : String
     }
