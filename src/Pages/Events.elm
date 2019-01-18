@@ -2,6 +2,7 @@ module Pages.Events exposing (getMyJSON, view, filterEvents)
 
 import Browser
 import Dict
+import Array
 import ElmTextSearch
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -33,7 +34,9 @@ viewJSON : Model -> Html Msg
 viewJSON model =
     div []
         [ div []
-            [ ul [] (List.map printItem model.eventsFiltered ) ]
+            [ ul [] (List.map printItem (Array.toList(Array.slice 0 3 (Array.fromList model.eventsFiltered)))) 
+            , pagination 3 model.eventsFiltered
+            ]
         ]
 
 
@@ -52,6 +55,20 @@ printItem evento =
         [ h3 [] [ text evento.obj.name ]
         , div [] nodes
         ]
+
+
+pagination : Float -> List (Searchable a) -> Html Msg
+pagination lengthForPage list =
+    let
+        lng =
+            ceiling (toFloat (List.length list) / lengthForPage)
+    in
+    numbersPage (List.range 1 lng)
+
+    
+numbersPage : List Int -> Html Msg
+numbersPage list = 
+    div [] (List.map (\num -> a [ href "#", style "margin" "0 10px" ] [ text (String.fromInt num) ]) list)
 
 
 filterEvents : String -> List (Searchable a) -> List (Searchable a)
